@@ -5,13 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WpfAppTest
+namespace Domain
 {
     public class UserVM : INotifyPropertyChanged
     {
         private string _id;
 
-       
+
 
         private string _name;
         private DateTime _birthday;
@@ -21,7 +21,9 @@ namespace WpfAppTest
         public string Id
         {
             get { return _id; }
-            set { _id = value;
+            set
+            {
+                _id = value;
                 this.NotifyPropertyChanged("Id");
             }
         }
@@ -35,7 +37,7 @@ namespace WpfAppTest
                 this.NotifyPropertyChanged("Name");
             }
         }
-                
+
 
         public DateTime Birthday
         {
@@ -50,7 +52,9 @@ namespace WpfAppTest
         public string Details
         {
             get { return _details; }
-            set { _details = value;
+            set
+            {
+                _details = value;
                 NotifyPropertyChanged("Details");
             }
         }
