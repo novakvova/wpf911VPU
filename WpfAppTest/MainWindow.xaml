@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WpfAppTest"
         mc:Ignorable="d"
-        Title="Головне вікно" Height="450" Width="800">
+        Title="Головне вікно" Height="450" Width="800" Loaded="Window_Loaded">
     <ScrollViewer HorizontalScrollBarVisibility="Visible">
         <Grid ShowGridLines="False">
             <Grid.RowDefinitions>
@@ -16,11 +16,50 @@
                 <ColumnDefinition  Width="500"/>
                 <ColumnDefinition MinWidth="300" />
             </Grid.ColumnDefinitions>
-            <TextBlock HorizontalAlignment="Center" 
+
+            <DataGrid Name="dgSimple" AutoGenerateColumns="false" Grid.Column="0" Grid.Row="0">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Назва" Binding="{Binding Name}"/>
+                    <DataGridTemplateColumn Header="Birthday">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <DatePicker SelectedDate="{Binding Birthday}" BorderThickness="0" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+                <DataGrid.RowDetailsTemplate>
+                    <DataTemplate>
+                        <DockPanel Background="GhostWhite">
+                            <Image DockPanel.Dock="Left" Source="{Binding ImageUrl}" Height="64" Margin="10" />
+                            <Grid Margin="0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Text="ID: " FontWeight="Bold" />
+                                <TextBlock Text="{Binding Id}" Grid.Column="1" />
+                                <TextBlock Text="Name: " FontWeight="Bold" Grid.Row="1" />
+                                <TextBlock Text="{Binding Name}" Grid.Column="1" Grid.Row="1" />
+                                <TextBlock Text="Birthday: " FontWeight="Bold" Grid.Row="2" />
+                                <TextBlock Text="{Binding Birthday, StringFormat=d}" Grid.Column="1" Grid.Row="2" />
+                                <!--<TextBlock Text="{Binding Details}" Margin="10" Grid.ColumnSpan="2" />-->
+                            </Grid>
+                        </DockPanel>
+                    </DataTemplate>
+                </DataGrid.RowDetailsTemplate>
+            </DataGrid>
+            <!--<TextBlock HorizontalAlignment="Center" 
                    FontSize="52"
                    VerticalAlignment="Center" Grid.Column="0" Grid.Row="0">
             Привіт WPF
-            </TextBlock>
+            </TextBlock>-->
 
 
             <DockPanel Grid.Column="1" LastChildFill ="True" Background="AliceBlue">
@@ -55,6 +94,23 @@
                                     <GradientStop Color="LightGreen" Offset="1"/>
                                 </LinearGradientBrush>
                             </TextBlock.Background>
+                        </TextBlock>
+                    </WrapPanel>
+                </Button.Content>
+            </Button>
+
+            <Button Name="btnChange"
+                FontSize="32"
+                Grid.Row="1"
+                Grid.Column="0" HorizontalAlignment="Left" VerticalAlignment="Top" Width="180" Click="btnChange_Click">
+                <Button.Content>
+                    <WrapPanel>
+                        <TextBlock 
+                        Padding="10"
+                        Text="Змінити"
+                               TextAlignment="Center"
+                               VerticalAlignment="Center"
+                           FontSize="28" >
                         </TextBlock>
                     </WrapPanel>
                 </Button.Content>
