@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Wpf.CatRent.Views;
 
 namespace Wpf.CatRent
 {
@@ -40,7 +41,10 @@ namespace Wpf.CatRent
                     Name = x.Name,
                     Birthday = x.Birthday,
                     Details = x.Details,
-                    ImageUrl = x.Image
+                    ImageUrl = x.Image,
+                    Price = x.AppCatPrices
+                        .OrderByDescending(x=>x.DateCreate)
+                        .FirstOrDefault().Price
                 }).ToList();
             _cats = new ObservableCollection<CatVM>(list);
             dgSimple.ItemsSource = _cats;
@@ -48,13 +52,14 @@ namespace Wpf.CatRent
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
-            _cats.Add(new CatVM
-            {
-                Name = "Петро",
-                Birthday = new DateTime(2000, 5, 15),
-                Details = "Дружить із директром Іванкой",
-                ImageUrl = "https://icdn.lenta.ru/images/2020/01/28/17/20200128170822958/square_320_9146846fb3b1bfae5672755bc1896214.jpg"
-            });
+            AddCatWindow addCat = new AddCatWindow(this._cats);
+            addCat.Show();
+        }
+
+        private void btnValidation_Click(object sender, RoutedEventArgs e)
+        {
+            UserView window = new UserView();
+            window.Show();
         }
 
         private void btnEdit_Click(object sender, RoutedEventArgs e)
