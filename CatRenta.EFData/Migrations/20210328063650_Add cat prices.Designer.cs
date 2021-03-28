@@ -3,15 +3,17 @@ using System;
 using CatRenta.EFData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace CatRenta.EFData.Migrations
 {
     [DbContext(typeof(EFDataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20210328063650_Add cat prices")]
+    partial class Addcatprices
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
