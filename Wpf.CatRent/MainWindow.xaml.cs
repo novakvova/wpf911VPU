@@ -1,10 +1,14 @@
 ﻿using CatRenta.Application;
+using CatRenta.Application.Interfaces;
 using CatRenta.EFData;
+using CatRenta.Infrastructure.Services;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,6 +30,7 @@ namespace Wpf.CatRent
     {
         private ObservableCollection<CatVM> _cats = new ObservableCollection<CatVM>();
         private EFDataContext _context = new EFDataContext();
+        bool abort = false;
         public MainWindow()
         {
             InitializeComponent();
@@ -61,6 +66,64 @@ namespace Wpf.CatRent
             UserView window = new UserView();
             window.Show();
         }
+
+        private void btnPauseAddRange_Click(object sender, RoutedEventArgs e)
+        {
+        }
+        private void btnCancelAddRange_Click(object sender, RoutedEventArgs e)
+        {
+            //ShowMessage();
+            abort = true;
+        }
+        private void btnAddRange_Click(object sender, RoutedEventArgs e)
+        {
+            Debug.WriteLine("Thread id: {0}", Thread.CurrentThread.ManagedThreadId);
+            //btnAddRange.IsEnabled = false;
+            //ShowMessage();
+            Thread thread = new Thread(ShowMessage);
+            thread.Start();
+        }
+        private void ShowMessage()
+        {
+
+            ICatService catService = new CatService();
+            catService.EventInsertItem += UpdateUIAsync;
+            catService.InsertCats(240);
+            //for (int i = 0; i < 50; i++)
+            //{
+            //    Debug.WriteLine("Thread ShowMessage id: {0}", Thread.CurrentThread.ManagedThreadId);
+            //    if (abort)
+            //    {
+            //        Dispatcher.Invoke(new Action(() =>
+            //        {
+            //            btnAddRange.IsEnabled = true;
+            //        }));
+            //        abort = false;
+            //        return;
+            //    }
+            //    Thread.Sleep(300);
+            //    Dispatcher.Invoke(new Action(()=> 
+            //    {
+            //        UpdateUIAsync(i + 1);
+            //        //op(i + 1);
+            //    }));
+            //}
+            //Dispatcher.Invoke(new Action(() =>
+            //{
+            //    btnAddRange.IsEnabled = true;
+            //}));
+        }
+
+        void UpdateUIAsync(int i)
+        {
+            Dispatcher.Invoke(new Action(() =>
+            {
+                btnAddRange.Content = $"{i}";
+                Debug.WriteLine("Thread id: {0}", Thread.CurrentThread.ManagedThreadId);
+            }));
+            
+        }
+
 
         private void btnEdit_Click(object sender, RoutedEventArgs e)
         {
