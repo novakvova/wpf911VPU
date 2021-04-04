@@ -87,7 +87,7 @@ namespace Wpf.CatRent
         {
             Dispatcher.Invoke(new Action(() =>
             {
-                btnAddRange.IsEnabled = true;
+                btnAddRange.IsEnabled = false;
             }));
             ICatService catService = new CatService();
             catService.EventInsertItem += UpdateUIAsync;
