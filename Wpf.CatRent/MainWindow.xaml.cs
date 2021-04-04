@@ -85,33 +85,14 @@ namespace Wpf.CatRent
         }
         private void ShowMessage()
         {
-
+            Dispatcher.Invoke(new Action(() =>
+            {
+                btnAddRange.IsEnabled = true;
+            }));
             ICatService catService = new CatService();
             catService.EventInsertItem += UpdateUIAsync;
             catService.InsertCats(240);
-            //for (int i = 0; i < 50; i++)
-            //{
-            //    Debug.WriteLine("Thread ShowMessage id: {0}", Thread.CurrentThread.ManagedThreadId);
-            //    if (abort)
-            //    {
-            //        Dispatcher.Invoke(new Action(() =>
-            //        {
-            //            btnAddRange.IsEnabled = true;
-            //        }));
-            //        abort = false;
-            //        return;
-            //    }
-            //    Thread.Sleep(300);
-            //    Dispatcher.Invoke(new Action(()=> 
-            //    {
-            //        UpdateUIAsync(i + 1);
-            //        //op(i + 1);
-            //    }));
-            //}
-            //Dispatcher.Invoke(new Action(() =>
-            //{
-            //    btnAddRange.IsEnabled = true;
-            //}));
+            
         }
 
         void UpdateUIAsync(int i)
