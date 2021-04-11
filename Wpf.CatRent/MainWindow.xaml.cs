@@ -35,7 +35,10 @@ namespace Wpf.CatRent
         {
             InitializeComponent();
             
+
             DataSeed.SeedDataAsync(_context);
+
+           
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -75,13 +78,27 @@ namespace Wpf.CatRent
             //ShowMessage();
             abort = true;
         }
-        private void btnAddRange_Click(object sender, RoutedEventArgs e)
+        private async void btnAddRange_Click(object sender, RoutedEventArgs e)
         {
             Debug.WriteLine("Thread id: {0}", Thread.CurrentThread.ManagedThreadId);
             //btnAddRange.IsEnabled = false;
             //ShowMessage();
-            Thread thread = new Thread(ShowMessage);
-            thread.Start();
+            //Action action = ShowMessage;
+            //Task task = new Task(action);
+            //Task task = new Task(() => ShowMessage());
+            //task.Start();
+            //MessageBox.Show(Environment.ProcessorCount.ToString());
+            //Task.Run(() => ShowMessage());
+
+            btnAddRange.IsEnabled = false;
+            ICatService catService = new CatService();
+            catService.EventInsertItem += UpdateUIAsync;
+            await catService.InsertCatsAsync(240);
+            btnAddRange.IsEnabled = true;
+
+            //Thread thread = new Thread(ShowMessage);
+            //thread.IsBackground = true;
+            //thread.Start();
         }
         private void ShowMessage()
         {
@@ -92,7 +109,11 @@ namespace Wpf.CatRent
             ICatService catService = new CatService();
             catService.EventInsertItem += UpdateUIAsync;
             catService.InsertCats(240);
-            
+            Dispatcher.Invoke(new Action(() =>
+            {
+                btnAddRange.IsEnabled = true;
+            }));
+
         }
 
         void UpdateUIAsync(int i)

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CatRenta.Application.Interfaces
 {
@@ -19,5 +20,7 @@ namespace CatRenta.Application.Interfaces
         /// </summary>
         /// <param name="count"></param>
         void InsertCats(int count);
+
+        Task InsertCatsAsync(int count);
     }
 }

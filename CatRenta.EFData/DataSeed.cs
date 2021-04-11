@@ -1,6 +1,7 @@
 ﻿using CatRenta.Domain;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,9 @@ namespace CatRenta.EFData
     {
         public static void SeedDataAsync(EFDataContext context)
         {
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
             if (!context.Cats.Any())
             {
                 var cats = new List<AppCat>
@@ -32,7 +36,21 @@ namespace CatRenta.EFData
                     context.SaveChanges();
                 }
             }
-            
+
+            stopWatch.Stop();
+
+            // Get the elapsed time as a TimeSpan value.
+            TimeSpan ts = stopWatch.Elapsed;
+
+            // Format and display the TimeSpan value.
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+            Debug.WriteLine("Сідер 1 закінчив свою роботу: " + elapsedTime);
+
+            stopWatch = new Stopwatch();
+            stopWatch.Start();
+
             if (!context.CatPrices.Any())
             {
                 var cat = context.Cats.FirstOrDefault();
@@ -58,6 +76,18 @@ namespace CatRenta.EFData
                     context.SaveChanges();
                 }
             }
+
+            stopWatch.Stop();
+
+            // Get the elapsed time as a TimeSpan value.
+            ts = stopWatch.Elapsed;
+
+            // Format and display the TimeSpan value.
+            elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+
+            Debug.WriteLine("Сідер 2 закінчив свою роботу: " + elapsedTime);
         }
     }
 }

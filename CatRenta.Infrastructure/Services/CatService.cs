@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace CatRenta.Infrastructure.Services
 {
@@ -56,6 +57,12 @@ namespace CatRenta.Infrastructure.Services
                 ts.Hours, ts.Minutes, ts.Seconds,
                 ts.Milliseconds / 10);
             Debug.WriteLine("Час додавання котів: "+ elapsedTime);
+        }
+
+        public Task InsertCatsAsync(int count)
+        {
+            return Task.Run(() => InsertCats(count));
+            //return Task.Run(() => { int i = 1 + 1;  });
         }
     }
 }
