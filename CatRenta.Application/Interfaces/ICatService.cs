@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CatRenta.Application.Interfaces
@@ -19,8 +20,10 @@ namespace CatRenta.Application.Interfaces
         /// Додати можину елементів в БД
         /// </summary>
         /// <param name="count"></param>
-        void InsertCats(int count);
+        void InsertCats(int count, ManualResetEvent mrse);
 
-        Task InsertCatsAsync(int count);
+        bool CanselAsyncMethod { get; set; }
+
+        Task InsertCatsAsync(int count, ManualResetEvent mrse);
     }
 }

@@ -30,20 +30,43 @@ namespace Wpf.CatRent
     {
         private ObservableCollection<CatVM> _cats = new ObservableCollection<CatVM>();
         private EFDataContext _context = new EFDataContext();
+        private ICatService _catService = new CatService();
+        ManualResetEvent _mrse = new ManualResetEvent(false);
         bool abort = false;
         public MainWindow()
         {
             InitializeComponent();
-            
-
-            DataSeed.SeedDataAsync(_context);
-
-           
+            _catService.EventInsertItem += UpdateUIAsync;
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        public async void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var list = _context.Cats
+            lblInfoStatus.Text = "Підключаємося до БД-----";
+            Stopwatch stopWatch = new Stopwatch();
+            stopWatch.Start();
+
+            await Task.Run(() =>
+            {
+                _context.Cats.Count(); //jніціалуємо підклчюення
+            });
+
+            stopWatch.Stop();
+            // Get the elapsed time as a TimeSpan value.
+            TimeSpan ts = stopWatch.Elapsed;
+
+            // Format and display the TimeSpan value.
+            string elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+            //Debug.WriteLine("Сідер 1 закінчив свою роботу: " + elapsedTime);
+            lblCursorPosition.Text = elapsedTime;
+            lblInfoStatus.Text = "Підключення до БД успішно";
+
+            await DataSeed.SeedDataAsync(_context);
+
+            stopWatch = new Stopwatch();
+            stopWatch.Start();
+            var list = _context.Cats.AsQueryable()//.AsParallel()
                 .Select(x => new CatVM()
                 {
                     Name = x.Name,
@@ -51,9 +74,26 @@ namespace Wpf.CatRent
                     Details = x.Details,
                     ImageUrl = x.Image,
                     Price = x.AppCatPrices
-                        .OrderByDescending(x=>x.DateCreate)
+                        .OrderByDescending(x => x.DateCreate)
                         .FirstOrDefault().Price
-                }).ToList();
+                })
+                .OrderBy(x=>x.Name)
+                .Skip(0)
+                .Take(20)
+                .ToList();
+
+            stopWatch.Stop();
+            // Get the elapsed time as a TimeSpan value.
+            ts = stopWatch.Elapsed;
+
+            // Format and display the TimeSpan value.
+            elapsedTime = String.Format("{0:00}:{1:00}:{2:00}.{3:00}",
+                ts.Hours, ts.Minutes, ts.Seconds,
+                ts.Milliseconds / 10);
+            //Debug.WriteLine("Сідер 1 закінчив свою роботу: " + elapsedTime);
+            lblCursorPosition.Text = elapsedTime;
+            lblInfoStatus.Text = "Читання даних із БД успішно";
+
             _cats = new ObservableCollection<CatVM>(list);
             dgSimple.ItemsSource = _cats;
         }
@@ -64,6 +104,10 @@ namespace Wpf.CatRent
             addCat.Show();
         }
 
+
+        public void Resume() => _mrse.Set();
+        public void Pause() => _mrse.Reset();
+
         private void btnValidation_Click(object sender, RoutedEventArgs e)
         {
             UserView window = new UserView();
@@ -72,12 +116,16 @@ namespace Wpf.CatRent
 
         private void btnPauseAddRange_Click(object sender, RoutedEventArgs e)
         {
+            this.Pause();
         }
+        
         private void btnCancelAddRange_Click(object sender, RoutedEventArgs e)
         {
             //ShowMessage();
-            abort = true;
+            _catService.CanselAsyncMethod = true;
+            //abort = true;
         }
+        
         private async void btnAddRange_Click(object sender, RoutedEventArgs e)
         {
             Debug.WriteLine("Thread id: {0}", Thread.CurrentThread.ManagedThreadId);
@@ -91,15 +139,19 @@ namespace Wpf.CatRent
             //Task.Run(() => ShowMessage());
 
             btnAddRange.IsEnabled = false;
-            ICatService catService = new CatService();
-            catService.EventInsertItem += UpdateUIAsync;
-            await catService.InsertCatsAsync(240);
+
+            this.Resume();
+            
+            int count = 3340;
+            pbCats.Maximum = count;
+            await _catService.InsertCatsAsync(count, _mrse);
             btnAddRange.IsEnabled = true;
 
             //Thread thread = new Thread(ShowMessage);
             //thread.IsBackground = true;
             //thread.Start();
         }
+        
         private void ShowMessage()
         {
             Dispatcher.Invoke(new Action(() =>
@@ -108,7 +160,7 @@ namespace Wpf.CatRent
             }));
             ICatService catService = new CatService();
             catService.EventInsertItem += UpdateUIAsync;
-            catService.InsertCats(240);
+            catService.InsertCats(240, _mrse);
             Dispatcher.Invoke(new Action(() =>
             {
                 btnAddRange.IsEnabled = true;
@@ -121,7 +173,8 @@ namespace Wpf.CatRent
             Dispatcher.Invoke(new Action(() =>
             {
                 btnAddRange.Content = $"{i}";
-                Debug.WriteLine("Thread id: {0}", Thread.CurrentThread.ManagedThreadId);
+                pbCats.Value = i;
+                //Debug.WriteLine("Thread id: {0}", Thread.CurrentThread.ManagedThreadId);
             }));
             
         }

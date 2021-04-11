@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CatRenta.Infrastructure.Services
@@ -18,6 +19,8 @@ namespace CatRenta.Infrastructure.Services
             _context = new EFDataContext();
         }
 
+        public bool CanselAsyncMethod { get; set; }
+
         public event InsertCatDelegate EventInsertItem;
 
         public int Count()
@@ -25,13 +28,19 @@ namespace CatRenta.Infrastructure.Services
             return _context.Cats.Count();
         }
 
-        public void InsertCats(int count)
+        public void InsertCats(int count, ManualResetEvent mrse)
         {
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
             
             for (int i = 0; i < count; i++)
             {
+                mrse.WaitOne();
+                if(CanselAsyncMethod)
+                {
+                    CanselAsyncMethod = false;
+                    break;
+                }
                 AppCat appCat = new AppCat
                 {
                     Name = "Name"+i,
@@ -59,9 +68,9 @@ namespace CatRenta.Infrastructure.Services
             Debug.WriteLine("Час додавання котів: "+ elapsedTime);
         }
 
-        public Task InsertCatsAsync(int count)
+        public Task InsertCatsAsync(int count, ManualResetEvent mrse)
         {
-            return Task.Run(() => InsertCats(count));
+            return Task.Run(() => InsertCats(count, mrse));
             //return Task.Run(() => { int i = 1 + 1;  });
         }
     }
